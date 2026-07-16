@@ -1,0 +1,212 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  admin
+  staff
+  cashier
+  customer
+}
+
+enum OrderStatus {
+  Pending
+  Confirmed
+  Preparing
+  Out_for_Delivery
+  Delivered
+  Cancelled
+}
+
+enum PaymentMethod {
+  Cash_on_Delivery
+  GCash
+  Maya
+}
+
+enum PaymentStatus {
+  Pending
+  Verified
+  Rejected
+}
+
+enum DeliveryType {
+  Pickup
+  Delivery
+}
+
+enum DiscountType {
+  fixed
+  percentage
+}
+
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  password       String
+  role           Role      @default(customer)
+  name           String
+  phone          String?
+  employeeNumber String?   @unique @map("employee_number")
+  birthDate      DateTime? @map("birth_date")
+  gender         String?
+  address        String?
+  dateHired      DateTime? @map("date_hired")
+  profilePicture String?   @map("profile_picture")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  customers Customer[]
+
+  @@map("users")
+}
+
+model Customer {
+  id          String   @id @default(uuid())
+  name        String
+  email       String?
+  phone       String
+  address     String
+  landmark    String?
+  latitude    Float?
+  longitude   Float?
+  totalOrders Int      @default(0) @map("total_orders")
+  userId      String?  @map("user_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  orders Order[]
+  user   User?   @relation(fields: [userId], references: [id])
+
+  @@map("customers")
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          String    @id @default(uuid())
+  categoryId  String    @map("category_id")
+  name        String
+  description String?
+  price       Decimal   @db.Decimal(10, 2)
+  stock       Int       @default(0)
+  image       String?
+  rating      Decimal?  @db.Decimal(3, 2)
+  reviews     Int       @default(0)
+  archived    Boolean   @default(false)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  category   Category   @relation(fields: [categoryId], references: [id])
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+
+  @@map("products")
+}
+
+model Order {
+  id            String        @id @default(uuid())
+  customerId    String        @map("customer_id")
+  subtotal      Decimal       @db.Decimal(10, 2)
+  deliveryFee   Decimal       @default(50) @map("delivery_fee")
+  total         Decimal       @db.Decimal(10, 2)
+  status        OrderStatus   @default(Pending)
+  paymentMethod PaymentMethod @map("payment_method")
+  paymentStatus PaymentStatus @default(Pending) @map("payment_status")
+  deliveryType  DeliveryType  @default(Delivery) @map("delivery_type")
+  deliveryDate  DateTime?     @map("delivery_date")
+  deliveryTime  String?       @map("delivery_time")
+  notes         String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  customer Customer    @relation(fields: [customerId], references: [id])
+  items    OrderItem[]
+  payment  Payment?
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String  @map("order_id")
+  productId String  @map("product_id")
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  orderId         String        @unique @map("order_id")
+  method          PaymentMethod
+  receipt         String?
+  referenceNumber String?       @map("reference_number")
+  amount          Decimal       @db.Decimal(10, 2)
+  status          PaymentStatus @default(Pending)
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
+
+model Promo {
+  id           String       @id @default(uuid())
+  code         String       @unique
+  discount     Decimal      @db.Decimal(10, 2)
+  discountType DiscountType @map("discount_type")
+  expiryDate   DateTime     @map("expiry_date")
+  maxUses      Int?         @map("max_uses")
+  currentUses  Int          @default(0) @map("current_uses")
+  active       Boolean      @default(true)
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  @@map("promos")
+}
+
+model BusinessSetting {
+  id           Int      @id @default(1)
+  businessName  String?  @map("business_name")
+  logo         String?
+  contactNumber String?  @map("contact_number")
+  facebook     String?
+  instagram    String?
+  address      String?
+  gcashQR      String?  @map("gcash_qr")
+  mayaQR       String?  @map("maya_qr")
+  bankAccount  String?  @map("bank_account")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("business_settings")
+}
+
+model CartItem {
+  id        String  @id @default(uuid())
+  sessionId String  @map("session_id")
+  productId String  @map("product_id")
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("cart_items")
+}
