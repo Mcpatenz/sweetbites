@@ -224,13 +224,15 @@ const ProductCardEnhanced = ({
         </button>
 
         {/* Quick View Button */}
-        <motion.button
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 10 }}
-          className="absolute bottom-3 right-3 z-20 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-all"
-        >
-          <Eye className="h-4 w-4 text-gray-600" />
-        </motion.button>
+        <Link href={`/products/${product.id}`}>
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 10 }}
+            className="absolute bottom-3 right-3 z-20 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-all"
+          >
+            <Eye className="h-4 w-4 text-gray-600" />
+          </motion.button>
+        </Link>
       </div>
 
       {/* Content */}
@@ -247,6 +249,10 @@ const ProductCardEnhanced = ({
         <p className="text-gray-500 text-sm line-clamp-2 mb-3">
           {product.description}
         </p>
+
+        <Link href={`/products/${product.id}`} className="text-pink-600 text-xs font-semibold hover:text-pink-700 transition-colors mb-2 inline-block">
+          View Details →
+        </Link>
 
         <div className="flex items-center justify-between">
           <div>

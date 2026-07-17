@@ -1412,6 +1412,13 @@ export default function HomePage() {
   } | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [productsLoading, setProductsLoading] = useState(true);
+  const [siteStats, setSiteStats] = useState({
+    happyCustomers: 0,
+    deliciousTreats: 0,
+    ordersDelivered: 0,
+    fiveStarReviews: 0,
+    yearsOfExcellence: 0,
+  });
 
   // Fetch products from database
   useEffect(() => {
@@ -1429,6 +1436,17 @@ export default function HomePage() {
       }
     };
     fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/stats");
+        const data = await res.json();
+        if (data.success) setSiteStats(data.data);
+      } catch {}
+    };
+    fetchStats();
   }, []);
 
   // Check authentication status on mount
@@ -1552,10 +1570,11 @@ export default function HomePage() {
   };
 
   const stats = [
-    { label: "Happy Customers", value: 12500, suffix: "+", icon: ThumbsUp },
-    { label: "Orders Delivered", value: 8500, suffix: "+", icon: Truck },
-    { label: "5-Star Reviews", value: 4900, suffix: "+", icon: Star },
-    { label: "Years of Excellence", value: 5, suffix: "+", icon: Award },
+    { label: "Happy Customers", value: siteStats.happyCustomers || 0, suffix: "+", icon: ThumbsUp },
+    { label: "Delicious Treats", value: siteStats.deliciousTreats || 0, suffix: "+", icon: Cake },
+    { label: "Orders Delivered", value: siteStats.ordersDelivered || 0, suffix: "+", icon: Truck },
+    { label: "5-Star Reviews", value: siteStats.fiveStarReviews || 0, suffix: "+", icon: Star },
+    { label: "Years of Excellence", value: siteStats.yearsOfExcellence || 0, suffix: "+", icon: Award },
   ];
 
   // Role badge component for header
@@ -2192,6 +2211,9 @@ export default function HomePage() {
                     <p className="text-gray-500 text-sm mb-3 line-clamp-2">
                       {product.description}
                     </p>
+                    <Link href={`/products/${product.id}`} className="text-pink-600 text-sm font-semibold hover:text-pink-700 transition-colors mb-3 inline-block">
+                      View Details →
+                    </Link>
                     <div className="flex items-center justify-between">
                       <div>
                         <span className="text-2xl font-bold text-pink-600">
@@ -2425,7 +2447,7 @@ export default function HomePage() {
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
               {stats.map((stat, index) => {
                 const Icon = stat.icon;
                 return (

@@ -57,3 +57,35 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    const existingOrder = await prisma.order.findUnique({
+      where: { id },
+      include: { payment: true },
+    });
+
+    if (!existingOrder) {
+      return NextResponse.json(
+        { success: false, message: "Order not found" },
+        { status: 404 }
+      );
+    }
+
+    await prisma.orderItem.deleteMany({ where: { orderId: id } });
+    await prisma.payment.deleteMany({ where: { orderId: id } });
+    await prisma.order.delete({ where: { id } });
+
+    return NextResponse.json({ success: true, message: "Order deleted successfully" });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, message: "Failed to delete order", error: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
+  }
+}

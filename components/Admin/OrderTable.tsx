@@ -3,16 +3,17 @@
 import { Order } from "@/lib/types";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { MapPin, Trash2 } from "lucide-react";
 
 interface OrderTableProps {
   orders: Order[];
   isAdmin?: boolean;
   onStatusChange?: (orderId: string, newStatus: string) => void;
   onTrack?: (order: Order) => void;
+  onDelete?: (order: Order) => void;
 }
 
-export default function OrderTable({ orders, isAdmin, onStatusChange, onTrack }: OrderTableProps) {
+export default function OrderTable({ orders, isAdmin, onStatusChange, onTrack, onDelete }: OrderTableProps) {
   const formatStatus = (s: string) => s.replace(/_/g, " ");
 
   return (
@@ -137,6 +138,15 @@ export default function OrderTable({ orders, isAdmin, onStatusChange, onTrack }:
                         View
                       </button>
                     </Link>
+                    {isAdmin && onDelete && (
+                      <button
+                        onClick={() => onDelete(order)}
+                        className="px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
+                      >
+                        <Trash2 size={12} className="inline mr-1" />
+                        Delete
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>
