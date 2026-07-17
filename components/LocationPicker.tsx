@@ -24,6 +24,9 @@ export default function LocationPicker({
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
     if (mapRef.current.classList.contains("leaflet-container")) return;
+    if ((mapRef.current as any)._leaflet_id) return;
+
+    let cancelled = false;
 
     const initMap = async () => {
       const L = (await import("leaflet")).default;
@@ -36,6 +39,8 @@ export default function LocationPicker({
         link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
         document.head.appendChild(link);
       }
+
+      if (cancelled || !mapRef.current || mapInstanceRef.current) return;
 
       const center: [number, number] = latitude && longitude
         ? [latitude, longitude]
@@ -85,6 +90,7 @@ export default function LocationPicker({
     initMap();
 
     return () => {
+      cancelled = true;
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;

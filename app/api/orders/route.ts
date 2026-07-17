@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ApiResponse } from "@/lib/types";
 import { sendOrderConfirmation, sendNewOrderToAdmin } from "@/lib/email";
+import { createNotification } from "@/lib/notifications";
 
 export async function GET(request: Request) {
   try {
@@ -190,6 +191,14 @@ export async function POST(request: Request) {
     };
     sendOrderConfirmation(emailOrder).catch(() => {});
     sendNewOrderToAdmin(emailOrder).catch(() => {});
+
+    // Create admin notification
+    createNotification({
+      type: "new_order",
+      title: "New Order",
+      message: `${customer.name} placed an order worth ₱${Number(order.total).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`,
+      orderId: order.id,
+    }).catch(() => {});
 
     return NextResponse.json<ApiResponse<any>>(
       {

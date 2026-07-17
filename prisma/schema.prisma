@@ -224,3 +224,15 @@ model CartItem {
 
   @@map("cart_items")
 }
+
+model Notification {
+  id        String   @id @default(uuid())
+  type      String
+  title     String
+  message   String
+  orderId   String?  @map("order_id")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("notifications")
+}

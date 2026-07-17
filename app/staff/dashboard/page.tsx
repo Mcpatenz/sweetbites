@@ -58,13 +58,12 @@ export default function StaffDashboard() {
 
   if (!user) return null;
 
-  const pendingOrders = orders.filter((o) => o.status === "Pending");
-  const confirmedOrders = orders.filter((o) => o.status === "Confirmed");
+  const pendingOrders = orders.filter((o) => o.status === "Confirmed");
   const preparingOrders = orders.filter((o) => o.status === "Preparing");
   const readyForCashier = orders.filter((o) => o.status === "Out_for_Delivery");
 
   const tabOrders = activeTab === "pending"
-    ? [...pendingOrders, ...confirmedOrders]
+    ? pendingOrders
     : activeTab === "preparing"
     ? preparingOrders
     : readyForCashier;
@@ -181,19 +180,19 @@ export default function StaffDashboard() {
           <div className="flex items-center gap-2 text-sm flex-wrap">
             <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full font-medium">Pending</span>
             <span className="text-gray-400">→</span>
-            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">Confirmed</span>
+            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">Confirmed (Admin)</span>
             <span className="text-gray-400">→</span>
-            <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full font-medium">Preparing</span>
+            <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full font-medium">Preparing (Staff)</span>
             <span className="text-gray-400">→</span>
-            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full font-medium">Ready (Out for Delivery)</span>
+            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full font-medium">Out for Delivery</span>
             <span className="text-gray-400">→</span>
-            <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full font-medium">Cashier & Delivery</span>
+            <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full font-medium">Delivered (Cashier)</span>
           </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <StatCard title="Pending" value={String(pendingOrders.length)} icon={<ShoppingCart size={28} />} color="yellow" />
-          <StatCard title="Confirmed" value={String(confirmedOrders.length)} icon={<CheckCircle size={28} />} color="blue" />
+          <StatCard title="To Prepare" value={String(pendingOrders.length)} icon={<ShoppingCart size={28} />} color="yellow" />
+          <StatCard title="Confirmed" value={String(pendingOrders.length)} icon={<CheckCircle size={28} />} color="blue" />
           <StatCard title="Preparing" value={String(preparingOrders.length)} icon={<Clock size={28} />} color="pink" />
           <StatCard title="Ready for Cashier" value={String(readyForCashier.length)} icon={<Send size={28} />} color="green" />
         </div>
@@ -201,7 +200,7 @@ export default function StaffDashboard() {
         {/* Tab Navigation */}
         <div className="flex gap-2 mb-6">
           {[
-            { key: "pending" as const, label: `Pending & Confirmed (${pendingOrders.length + confirmedOrders.length})` },
+            { key: "pending" as const, label: `Confirmed (${pendingOrders.length})` },
             { key: "preparing" as const, label: `Preparing (${preparingOrders.length})` },
             { key: "ready" as const, label: `Ready for Cashier (${readyForCashier.length})` },
           ].map((tab) => (
@@ -230,8 +229,7 @@ export default function StaffDashboard() {
               {tabOrders.map((order) => {
                 const items = order.items || [];
                 const totalItems = items.reduce((sum: number, item: any) => sum + item.quantity, 0);
-                const isPending = order.status === "Pending";
-                const isConfirmed = order.status === "Confirmed";
+                const isPending = order.status === "Confirmed";
                 const isPreparing = order.status === "Preparing";
 
                 return (
@@ -284,12 +282,6 @@ export default function StaffDashboard() {
                         <span className="font-bold text-pink-600">₱{Number(order.total).toLocaleString()}</span>
                         <div className="flex gap-2">
                           {isPending && (
-                            <button onClick={() => updateStatus(order.id, "Confirmed")}
-                              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
-                              Confirm Order
-                            </button>
-                          )}
-                          {isConfirmed && (
                             <button onClick={() => updateStatus(order.id, "Preparing")}
                               className="px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-semibold hover:bg-orange-600 transition-colors">
                               Start Preparing

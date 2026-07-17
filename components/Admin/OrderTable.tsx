@@ -82,12 +82,12 @@ export default function OrderTable({ orders, isAdmin, onStatusChange, onTrack, o
                               : "bg-blue-100 text-blue-800"
                       }`}
                     >
-                      <option value="Pending">Pending</option>
+                      {order.status === "Pending" && (
+                        <option value="Pending">Pending</option>
+                      )}
                       <option value="Confirmed">Confirmed</option>
-                      <option value="Preparing">Preparing</option>
-                      <option value="Out_for_Delivery">Out for Delivery</option>
-                      <option value="Delivered">Delivered</option>
                       <option value="Cancelled">Cancelled</option>
+                      <option value={order.status}>{formatStatus(order.status)} (current)</option>
                     </select>
                   ) : (
                     <span

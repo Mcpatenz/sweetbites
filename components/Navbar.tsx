@@ -17,6 +17,7 @@ import {
   LogOut as LogOutIcon,
   X,
   LogIn,
+  Bell,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -27,6 +28,10 @@ export default function Navbar() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [userRole, setUserRole] = useState<string>("");
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const readCartCount = () => {
     try {
@@ -47,7 +52,11 @@ export default function Navbar() {
   useEffect(() => {
     try {
       const user = localStorage.getItem("sweet-bites-user");
-      if (user) setIsLoggedIn(true);
+      if (user) {
+        const parsed = JSON.parse(user);
+        setIsLoggedIn(true);
+        setUserRole(parsed.role || "");
+      }
     } catch {
       // not logged in
     }
@@ -62,6 +71,40 @@ export default function Navbar() {
       window.removeEventListener("cart-updated", onCartUpdated);
     };
   }, []);
+
+  const isStaffRole = ["admin", "staff", "cashier"].includes(userRole);
+
+  const fetchNotifications = async () => {
+    if (!isStaffRole) return;
+    try {
+      const res = await fetch("/api/notifications");
+      const data = await res.json();
+      if (data.success) {
+        setNotifications(data.data);
+        setUnreadCount(data.unreadCount);
+      }
+    } catch {}
+  };
+
+  useEffect(() => {
+    if (isStaffRole) {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 15000);
+      return () => clearInterval(interval);
+    }
+  }, [isStaffRole]);
+
+  const markAllRead = async () => {
+    try {
+      await fetch("/api/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ markAll: true }),
+      });
+      setUnreadCount(0);
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    } catch {}
+  };
 
   const customerLinks = [
     { href: "/", label: "Home", icon: Home },
@@ -140,7 +183,7 @@ export default function Navbar() {
               ))}
             </div>
 
-            {/* Cart & Auth Icons */}
+            {/* Cart, Notifications & Auth Icons */}
             <div className="flex items-center gap-4">
               {!isAdmin && isLoggedIn && (
                 <Link href="/cart" className="relative">
@@ -152,6 +195,56 @@ export default function Navbar() {
                     {cartCount}
                   </span>
                 </Link>
+              )}
+              {isStaffRole && (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <Bell size={22} className="text-gray-600 hover:text-pink-600" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
+                  </button>
+                  {showNotifications && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
+                      <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-96 overflow-hidden">
+                        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                          <h3 className="font-bold text-gray-800">Notifications</h3>
+                          {unreadCount > 0 && (
+                            <button onClick={markAllRead} className="text-xs text-pink-600 hover:text-pink-700 font-semibold">
+                              Mark all read
+                            </button>
+                          )}
+                        </div>
+                        <div className="overflow-y-auto max-h-72">
+                          {notifications.length === 0 ? (
+                            <p className="p-4 text-center text-gray-400 text-sm">No notifications</p>
+                          ) : (
+                            notifications.slice(0, 20).map((n) => (
+                              <div key={n.id} className={`p-3 border-b border-gray-50 ${!n.read ? "bg-pink-50" : ""}`}>
+                                <div className="flex items-start gap-2">
+                                  {!n.read && <div className="w-2 h-2 bg-pink-500 rounded-full mt-1.5 shrink-0" />}
+                                  <div className="min-w-0">
+                                    <p className="text-sm font-semibold text-gray-800">{n.title}</p>
+                                    <p className="text-xs text-gray-500 mt-0.5 truncate">{n.message}</p>
+                                    <p className="text-xs text-gray-400 mt-1">
+                                      {new Date(n.createdAt).toLocaleString("en-PH", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               )}
               {isLoggedIn ? (
                 <button
