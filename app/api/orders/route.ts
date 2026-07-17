@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ApiResponse } from "@/lib/types";
+import { sendOrderConfirmation, sendNewOrderToAdmin } from "@/lib/email";
 
 export async function GET(request: Request) {
   try {
@@ -175,6 +176,20 @@ export async function POST(request: Request) {
         },
       });
     }
+
+    // Send email notifications (non-blocking)
+    const emailOrder = {
+      ...order,
+      subtotal: Number(order.subtotal),
+      deliveryFee: Number(order.deliveryFee),
+      total: Number(order.total),
+      items: order.items.map((item) => ({
+        ...item,
+        price: Number(item.price),
+      })),
+    };
+    sendOrderConfirmation(emailOrder).catch(() => {});
+    sendNewOrderToAdmin(emailOrder).catch(() => {});
 
     return NextResponse.json<ApiResponse<any>>(
       {

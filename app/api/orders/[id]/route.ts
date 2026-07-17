@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendStatusUpdateToCustomer, sendStatusUpdateToAdmin } from "@/lib/email";
 
 export async function GET(
   _request: Request,
@@ -46,8 +47,32 @@ export async function PATCH(
         status: body.status,
         paymentStatus: body.paymentStatus,
       },
-      include: { items: true, customer: true },
+      include: {
+        items: { include: { product: true } },
+        customer: { include: { user: true } },
+      },
     });
+
+    // Send status update emails (non-blocking)
+    if (body.status) {
+      const emailData = {
+        id: order.id,
+        status: order.status as string,
+        total: Number(order.total),
+        items: order.items.map((item) => ({
+          product: item.product ? { name: item.product.name } : undefined,
+          quantity: item.quantity,
+          price: Number(item.price),
+        })),
+        customer: {
+          name: order.customer.name,
+          email: order.customer.email || order.customer.user?.email || undefined,
+          phone: order.customer.phone,
+        },
+      };
+      sendStatusUpdateToCustomer(emailData).catch(() => {});
+      sendStatusUpdateToAdmin(emailData).catch(() => {});
+    }
 
     return NextResponse.json({ success: true, data: order });
   } catch (error) {
