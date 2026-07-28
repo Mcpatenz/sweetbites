@@ -33,9 +33,18 @@ export async function POST(request: Request) {
     const ext = file.name.split(".").pop() || "png";
     const filename = `${randomUUID()}.${ext}`;
 
+    const token = process.env.BLOB_READ_WRITE_TOKEN;
+    if (!token) {
+      return NextResponse.json(
+        { success: false, message: "Failed to upload file", error: "BLOB_READ_WRITE_TOKEN is not set" },
+        { status: 500 },
+      );
+    }
+
     const blob = await put(filename, file, {
       access: "public",
       contentType: file.type,
+      token,
     });
 
     return NextResponse.json({
