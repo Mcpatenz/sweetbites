@@ -208,7 +208,7 @@ export default function AdminProductsPage() {
         setImagePreview(data.data.url);
         showToast("Image uploaded successfully!", "success");
       } else {
-        showToast(data.message || "Failed to upload image", "error");
+        showToast(data.error ? `${data.message}: ${data.error}` : data.message || "Failed to upload image", "error");
       }
     } catch (error) {
       console.error("Upload error:", error);
