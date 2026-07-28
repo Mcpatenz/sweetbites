@@ -109,6 +109,9 @@ export default function AdminProductsPage() {
     alt: string;
   } | null>(null);
   const [showLowStockModal, setShowLowStockModal] = useState(false);
+  const [categories, setCategories] = useState<
+    { id: string; name: string }[]
+  >([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -146,8 +149,21 @@ export default function AdminProductsPage() {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch("/api/categories");
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setCategories(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
   const handleInputChange = (
@@ -264,8 +280,6 @@ export default function AdminProductsPage() {
         image: formData.image || null,
       };
 
-      console.log("Sending payload:", payload);
-
       let response;
       if (editingId) {
         response = await fetch(`/api/products/${editingId}`, {
@@ -282,7 +296,6 @@ export default function AdminProductsPage() {
       }
 
       const data = await response.json();
-      console.log("Response:", data);
 
       if (response.ok && data.success) {
         showToast(
@@ -387,16 +400,9 @@ export default function AdminProductsPage() {
   );
   const totalValue = products.reduce((sum, p) => sum + p.price * p.stock, 0);
 
-  const categories = [
-    { id: "all", label: "All Categories" },
-    { id: "cakes", label: "Cakes" },
-    { id: "cupcakes", label: "Cupcakes" },
-    { id: "cheesecakes", label: "Cheesecakes" },
-    { id: "cookies", label: "Cookies" },
-    { id: "desserts", label: "Desserts" },
-    { id: "drinks", label: "Drinks" },
-    { id: "snacks", label: "Snacks" },
-    { id: "meals", label: "Meals" },
+  const filterCategories = [
+    { id: "all", name: "All Categories" },
+    ...categories,
   ];
 
   return (
@@ -553,14 +559,11 @@ export default function AdminProductsPage() {
                       className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                     >
                       <option value="">Select Category</option>
-                      <option value="cakes">Cakes</option>
-                      <option value="cupcakes">Cupcakes</option>
-                      <option value="cheesecakes">Cheesecakes</option>
-                      <option value="cookies">Cookies</option>
-                      <option value="desserts">Desserts</option>
-                      <option value="drinks">Drinks</option>
-                      <option value="snacks">Snacks</option>
-                      <option value="meals">Meals</option>
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   <div>
@@ -746,7 +749,7 @@ export default function AdminProductsPage() {
           >
             <div className="bg-white rounded-xl shadow-md p-4 mb-6 border border-gray-100">
               <div className="flex flex-wrap gap-3">
-                {categories.map((cat) => (
+                {filterCategories.map((cat) => (
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.id)}
@@ -756,7 +759,7 @@ export default function AdminProductsPage() {
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
-                    {cat.label}
+                    {cat.name}
                   </button>
                 ))}
               </div>
@@ -857,12 +860,12 @@ export default function AdminProductsPage() {
                         {product.name}
                       </div>
                       <div className="text-xs text-gray-400 line-clamp-1 md:hidden">
-                        {product.categoryId}
+                        {product.category?.name ?? product.categoryId}
                       </div>
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">
                       <span className="px-2 py-1 bg-gray-100 rounded-full text-xs font-medium text-gray-600 capitalize">
-                        {product.categoryId}
+                        {product.category?.name ?? product.categoryId}
                       </span>
                     </td>
                     <td className="px-4 py-3 font-bold text-pink-600">
@@ -1053,7 +1056,7 @@ export default function AdminProductsPage() {
                             {product.name}
                           </div>
                           <div className="text-xs text-gray-400 capitalize">
-                            {product.categoryId}
+                            {product.category?.name ?? product.categoryId}
                           </div>
                         </div>
                         <div className="text-right shrink-0">
@@ -1089,8 +1092,5 @@ function formatCurrency(amount: number): string {
     currency: "PHP",
     minimumFractionDigits: 2,
   }).format(amount);
-}
-function fetchProducts() {
-  throw new Error("Function not implemented.");
 }
 

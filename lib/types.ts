@@ -29,6 +29,7 @@ export interface Product {
   archived: boolean;
   createdAt: Date;
   updatedAt: Date;
+  category?: Category;
 }
 
 // Cart & Orders
