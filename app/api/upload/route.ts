@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
-import { join } from "path";
+import { put } from "@vercel/blob";
 import { randomUUID } from "crypto";
 
 export async function POST(request: Request) {
@@ -33,18 +32,16 @@ export async function POST(request: Request) {
 
     const ext = file.name.split(".").pop() || "png";
     const filename = `${randomUUID()}.${ext}`;
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
 
-    const uploadDir = join(process.cwd(), "public", "products");
-    await writeFile(join(uploadDir, filename), buffer);
-
-    const imageUrl = `/products/${filename}`;
+    const blob = await put(filename, file, {
+      access: "public",
+      contentType: file.type,
+    });
 
     return NextResponse.json({
       success: true,
       message: "File uploaded successfully",
-      data: { url: imageUrl },
+      data: { url: blob.url },
     });
   } catch (error) {
     return NextResponse.json(
