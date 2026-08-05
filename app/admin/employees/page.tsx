@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, X, UserCog, Camera, Eye, EyeOff } from "lucide-react";
+import { getImageSrc } from "@/lib/image";
 
 interface Employee {
   id: string;
@@ -340,7 +341,7 @@ export default function AdminEmployeesPage() {
               >
                 {formData.profilePicture ? (
                   <img
-                    src={formData.profilePicture}
+                    src={getImageSrc(formData.profilePicture)}
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />
@@ -636,7 +637,7 @@ export default function AdminEmployeesPage() {
                   <td className="px-6 py-3 font-semibold flex items-center gap-2">
                     {emp.profilePicture ? (
                       <img
-                        src={emp.profilePicture}
+                        src={getImageSrc(emp.profilePicture)}
                         alt={emp.name}
                         className="w-8 h-8 rounded-full object-cover"
                       />

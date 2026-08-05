@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     }
 
     const blob = await put(filename, file, {
-      access: "public",
+      access: "private",
       contentType: file.type,
       token,
     });

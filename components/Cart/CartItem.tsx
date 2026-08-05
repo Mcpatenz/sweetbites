@@ -2,6 +2,7 @@
 
 import { CartItem, Product } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
+import { getImageSrc } from "@/lib/image";
 import { Trash2, Plus, Minus } from "lucide-react";
 
 interface CartItemProps {
@@ -23,7 +24,7 @@ export default function CartItemComponent({
       <div className="w-24 h-24 bg-gray-200 rounded shrink-0">
         {product?.image && (
           <img
-            src={product.image}
+            src={getImageSrc(product.image)}
             alt={product.name}
             className="w-full h-full object-cover rounded"
           />

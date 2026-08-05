@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Product } from "@/lib/types";
+import { getImageSrc } from "@/lib/image";
 import {
   Plus,
   Edit2,
@@ -655,7 +656,7 @@ export default function AdminProductsPage() {
                           className="relative"
                         >
                           <img
-                            src={imagePreview}
+                            src={getImageSrc(imagePreview)}
                             alt="Preview"
                             className="w-32 h-32 object-cover rounded-xl border-2 border-pink-200"
                           />
@@ -837,14 +838,14 @@ export default function AdminProductsPage() {
                           type="button"
                           onClick={() =>
                             setViewingImage({
-                              src: product.image,
+                              src: getImageSrc(product.image),
                               alt: product.name,
                             })
                           }
                           className="cursor-pointer"
                         >
                           <img
-                            src={product.image}
+                            src={getImageSrc(product.image)}
                             alt={product.name}
                             className="w-12 h-12 object-cover rounded-lg border border-gray-200 hover:scale-110 hover:shadow-md transition-all"
                           />
@@ -1042,7 +1043,7 @@ export default function AdminProductsPage() {
                       >
                         {product.image ? (
                           <img
-                            src={product.image}
+                            src={getImageSrc(product.image)}
                             alt={product.name}
                             className="w-12 h-12 object-cover rounded-lg border border-gray-200 shrink-0"
                           />

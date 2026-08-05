@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
+import { getImageSrc } from "@/lib/image";
 import { ShoppingCart, Star } from "lucide-react";
 import { useState } from "react";
 
@@ -27,7 +28,7 @@ export default function ProductCard({
       {/* Image */}
       <div className="relative h-48 bg-gray-200 overflow-hidden">
         <Image
-          src={product.image || "/placeholder.png"}
+          src={getImageSrc(product.image) || "/placeholder.png"}
           alt={product.name}
           fill
           className="object-cover hover:scale-110 transition-transform"

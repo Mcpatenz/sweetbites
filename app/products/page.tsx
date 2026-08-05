@@ -37,6 +37,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Product } from "@/lib/types";
+import { getImageSrc } from "@/lib/image";
 
 
 
@@ -163,7 +164,7 @@ const ProductCardEnhanced = ({
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
           {product.image ? (
             <motion.img
-              src={product.image}
+              src={getImageSrc(product.image)}
               alt={product.name}
               className="w-full h-full object-cover"
               animate={{

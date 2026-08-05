@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { CartItem, Product } from "@/lib/types";
+import { getImageSrc } from "@/lib/image";
 
 const LocationPicker = dynamic(() => import("@/components/LocationPicker"), {
   ssr: false,
@@ -71,7 +72,7 @@ const CartItemComponent = ({
         <div className="relative w-full sm:w-32 h-32 bg-linear-to-br from-gray-100 to-gray-200 rounded-xl overflow-hidden shrink-0">
           {product?.image ? (
             <img
-              src={product.image}
+              src={getImageSrc(product.image)}
               alt={productName}
               className="w-full h-full object-cover"
             />
@@ -670,7 +671,7 @@ export default function CartPage() {
                     <div className="w-full h-20 bg-gray-100 rounded-lg mb-2 flex items-center justify-center overflow-hidden">
                       {product.image ? (
                         <img
-                          src={product.image}
+                          src={getImageSrc(product.image)}
                           alt={product.name}
                           className="w-full h-full object-cover"
                         />

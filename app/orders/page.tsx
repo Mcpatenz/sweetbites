@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { getImageSrc } from "@/lib/image";
 import {
   Package,
   Clock,
@@ -252,7 +253,7 @@ export default function OrdersPage() {
                         {order.items.slice(0, 4).map((item) => (
                           <div key={item.id} className="w-10 h-10 rounded-full bg-gray-100 border-2 border-white overflow-hidden">
                             {item.product?.image ? (
-                              <img src={item.product.image} alt="" className="w-full h-full object-cover" />
+                              <img src={getImageSrc(item.product.image)} alt="" className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-sm">🍰</div>
                             )}

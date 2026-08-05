@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { Star, ShoppingCart, ArrowLeft, Send } from "lucide-react";
 import { toast, Toaster } from "sonner";
+import { getImageSrc } from "@/lib/image";
 
 interface Review {
   id: string;
@@ -164,7 +165,7 @@ export default function ProductDetailPage({
             <div className="md:w-1/2 bg-gray-100 flex items-center justify-center min-h-[300px]">
               {product.image ? (
                 <img
-                  src={product.image}
+                  src={getImageSrc(product.image)}
                   alt={product.name}
                   className="w-full h-full object-cover"
                 />

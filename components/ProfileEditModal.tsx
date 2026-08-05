@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Camera, User, Phone, MapPin, Save, Loader2, Lock, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { getImageSrc } from "@/lib/image";
 
 interface ProfileEditModalProps {
   isOpen: boolean;
@@ -152,7 +153,7 @@ export default function ProfileEditModal({ isOpen, onClose, user, onUpdated }: P
               <div className="flex flex-col items-center">
                 <div className="relative group">
                   {profilePicture ? (
-                    <img src={profilePicture} alt="Profile" className="w-24 h-24 rounded-full object-cover border-4 border-pink-200" />
+                    <img src={getImageSrc(profilePicture)} alt="Profile" className="w-24 h-24 rounded-full object-cover border-4 border-pink-200" />
                   ) : (
                     <div className="w-24 h-24 rounded-full bg-linear-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white text-3xl font-bold border-4 border-pink-200">
                       {name?.charAt(0)?.toUpperCase() || "U"}

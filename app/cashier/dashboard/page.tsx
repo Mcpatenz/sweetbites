@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import StatCard from "@/components/Admin/StatCard";
+import { getImageSrc } from "@/lib/image";
 import OrderReceipt from "@/components/Receipt";
 import ProfileEditModal from "@/components/ProfileEditModal";
 import { DollarSign, Wallet, CreditCard, CheckCircle, Package, BarChart3, Printer, MapPin, User, Phone, Mail, Calendar, Briefcase, Hash, Pencil } from "lucide-react";
@@ -252,7 +253,7 @@ export default function CashierDashboard() {
           <div className="flex items-start gap-6">
             <div className="shrink-0">
               {user.profilePicture ? (
-                <img src={user.profilePicture} alt={user.name}
+                <img src={getImageSrc(user.profilePicture)} alt={user.name}
                   className="w-20 h-20 rounded-full object-cover border-4 border-pink-200" />
               ) : (
                 <div className="w-20 h-20 rounded-full bg-linear-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white text-3xl font-bold border-4 border-pink-200">

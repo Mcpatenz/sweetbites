@@ -6,6 +6,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { getImageSrc } from "@/lib/image";
 import { Package, Truck, MapPin, CreditCard, Calendar, ArrowLeft, ArrowRight, CheckCircle, Clock, ChefHat, XCircle, LayoutDashboard } from "lucide-react";
 
 const statusFlow = ["Pending", "Confirmed", "Preparing", "Out_for_Delivery", "Delivered"];
@@ -200,7 +201,7 @@ export default function OrderDetailsPage() {
                 <div key={item.id} className="flex gap-4 p-4 bg-gray-50 rounded-xl">
                   <div className="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden shrink-0">
                     {item.product?.image && (
-                      <img src={item.product.image} alt={item.product.name} className="w-full h-full object-cover" />
+                      <img src={getImageSrc(item.product.image)} alt={item.product.name} className="w-full h-full object-cover" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">

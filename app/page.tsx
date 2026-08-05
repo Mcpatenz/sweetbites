@@ -50,6 +50,7 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import type { CartItem, Product } from "@/lib/types";
+import { getImageSrc } from "@/lib/image";
 
 const categoryIcons: Record<string, typeof Cake> = {
   cakes: Cake,
@@ -2060,7 +2061,7 @@ export default function HomePage() {
                       <div className="aspect-square bg-white/20 rounded-lg mb-2 flex items-center justify-center overflow-hidden">
                         {product.image ? (
                           <img
-                            src={product.image}
+                            src={getImageSrc(product.image)}
                             alt={product.name}
                             className="w-full h-full object-cover"
                           />
@@ -2175,7 +2176,7 @@ export default function HomePage() {
                     <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
                       {product.image ? (
                         <motion.img
-                          src={product.image}
+                          src={getImageSrc(product.image)}
                           alt={product.name}
                           className="w-full h-full object-cover"
                           animate={{
@@ -2347,7 +2348,7 @@ export default function HomePage() {
                   <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                     {product.image ? (
                       <img
-                        src={product.image}
+                        src={getImageSrc(product.image)}
                         alt={product.name}
                         className="w-full h-full object-cover"
                       />
